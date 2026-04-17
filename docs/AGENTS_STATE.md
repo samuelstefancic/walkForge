@@ -7,31 +7,37 @@
 ## 🎛️ Orchestrateur
 
 - **Statut** : actif
-- **Sprint en cours** : Sprint 1 — Fondations BLE + Infrastructure
+- **Sprint en cours** : Sprint 2 — Contrôle vitesse + Session live
+- **Sprint précédent** : ✅ Sprint 1 mergé (commit `cc71b9e`)
 - **Bloquants** : aucun
-- **Prochaine étape** : validation Sprint 1 → Sprint 2 (UI + use cases session)
+- **Prochaine étape** : Sprint 3 (notifications, programmes, maintenance)
 
 ---
 
-## Sprint 1 — Agents actifs
+## Sprint 1 (✅ mergé) — Livrables
 
-| Agent          | Statut   | Livrable                                                        | Review |
-| -------------- | -------- | --------------------------------------------------------------- | ------ |
-| Agent-BLE      | ✅ livré | `BLECore` (FTMS parser, `BLEManager`, `MockBLEManager`)         | ⏳     |
-| Agent-Domain   | ✅ livré | `DomainKit` (entités + protocols + errors)                      | ⏳     |
-| Agent-Tests    | ✅ livré | Tests unitaires FTMS parser + MockBLE                           | ⏳     |
-| Agent-DocC     | ✅ livré | Commentaires `///` sur API publiques                            | ⏳     |
-| Agent-Reviewer | ⏳       | Checklist Clean Architecture + Swift 6 strict concurrency       | —      |
-| Agent-Security | ⏳       | Audit BLE (bounds checking, logs, données sensibles)            | —      |
+| Agent          | Livrable                                                          | Tests  |
+| -------------- | ----------------------------------------------------------------- | ------ |
+| Agent-BLE      | `BLECore` (FTMS parser, `BLEManager`, `MockBLEManager`)           | 38 ✅  |
+| Agent-Domain   | `DomainKit` entités + protocols + errors                          | 12 ✅  |
+
+## Sprint 2 — Agents actifs
+
+| Agent          | Statut   | Livrable                                                          | Tests  |
+| -------------- | -------- | ----------------------------------------------------------------- | ------ |
+| Agent-Domain   | ✅ livré | 5 use cases (StartSession, StopSession, SetTargetSpeed, SetIncline, CalculateCalories) | 19 ✅ |
+| Agent-UI       | ✅ livré | `DesignSystem` (palette, typography, spacing, haptics, 5 composants)                   | 1 ✅   |
+| Agent-Session  | ✅ livré | App iOS + `DashboardViewModel` + `DashboardView`                  | —      |
+| Agent-Reviewer | ⏳       | Checklist Clean Architecture + Swift 6 strict concurrency         | —      |
+| Agent-Security | ⏳       | Audit : pas de données perso en logs, no force unwrap             | —      |
 
 ---
 
 ## Sprints suivants (scaffold)
 
-- Sprint 2 : Agent-Session, Agent-UI, Agent-Domain (use cases), Agent-Reviewer
-- Sprint 3 : Agent-Infra (notifications), Agent-Profile, Agent-Security
+- Sprint 3 : Agent-Infra (notifications), Agent-Data (SwiftData + repositories), Agent-Profile, Agent-Security
 - Sprint 4 : Agent-History, Agent-Infra (HealthKit), Agent-Widgets, Agent-Accessibility
-- Sprint 5 : Agent-Reviewer, Agent-Security, Agent-Tests (audit final)
+- Sprint 5 : Agent-Reviewer, Agent-Security, Agent-Tests (audit final + Apple Developer Program + TestFlight)
 
 ---
 

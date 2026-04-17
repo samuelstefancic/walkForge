@@ -26,27 +26,32 @@ Clean Architecture à 3 couches, modules SPM séparés :
 
 ```
 walkForge/
-├── App/                          # Cible iOS (ajoutée au Sprint 2)
+├── project.yml                   # Définition Xcode project (XcodeGen)
+├── App/                          # Cible iOS 18+
+│   ├── WalkForgeApp.swift
+│   ├── Views/                    # Dashboard, futurs écrans
+│   ├── ViewModels/               # @Observable (framework Observation)
+│   └── Resources/                # Assets.xcassets (icônes, couleurs)
 ├── Packages/
-│   ├── BLECore/                  # CoreBluetooth + parser FTMS
-│   ├── DomainKit/                # Entités + Use Cases + Protocols (pure Swift)
+│   ├── BLECore/                  # CoreBluetooth + parser FTMS (Sprint 1)
+│   ├── DomainKit/                # Entités + Use Cases + Protocols (Sprint 1-2)
+│   ├── DesignSystem/             # Palette + composants SwiftUI (Sprint 2)
 │   ├── DataKit/                  # SwiftData + repositories (Sprint 3)
-│   ├── HealthKitBridge/          # Intégration HealthKit (Sprint 4)
-│   ├── DesignSystem/             # Palette, composants (Sprint 2)
 │   ├── NotificationKit/          # UserNotifications (Sprint 3)
+│   ├── HealthKitBridge/          # Intégration HealthKit (Sprint 4)
 │   └── WidgetExtension/          # Widgets (Sprint 4)
 ├── WatchApp/                     # Scaffold watchOS (Sprint 5)
 ├── docs/
 │   ├── CLAUDE.md                 # Prompt orchestrateur multi-agent
 │   ├── AGENTS_STATE.md           # État des agents
 │   └── ARCHITECTURE.md           # Décisions architecturales
-└── .github/workflows/ci.yml      # Build + tests + lint
+└── .github/workflows/ci.yml      # Lint + tests + build iOS Simulator
 ```
 
 ## Sprints
 
 - [x] **Sprint 1** — Fondations BLE + Infrastructure (parser FTMS, MockBLE, protocols domaine, CI)
-- [ ] **Sprint 2** — Contrôle vitesse + Session live
+- [x] **Sprint 2** — Contrôle vitesse + Session live (use cases, DesignSystem, iOS app, Dashboard)
 - [ ] **Sprint 3** — Notifications + Programmes + Maintenance
 - [ ] **Sprint 4** — Historique + HealthKit + Widgets
 - [ ] **Sprint 5** — Polish, CI/CD complet, App Store
@@ -60,18 +65,29 @@ Voir [`docs/CLAUDE.md`](docs/CLAUDE.md) pour le prompt orchestrateur complet.
 - macOS 15+
 - Xcode 26+
 - Swift 6.2
-- SwiftLint + SwiftFormat : `brew install swiftlint swiftformat xcbeautify`
+- Tooling : `brew install swiftlint swiftformat xcbeautify xcodegen`
+
+### Générer le projet Xcode
+
+Le `WalkForge.xcodeproj` est **généré** à partir de `project.yml` (non versionné) :
+
+```bash
+xcodegen generate
+open WalkForge.xcodeproj
+```
 
 ### Build + tests
 
-Chaque module SPM est indépendant :
-
 ```bash
-# DomainKit
+# Packages SPM (tests isolés, rapides)
 cd Packages/DomainKit && swift test
+cd Packages/BLECore   && swift test
+cd Packages/DesignSystem && swift test
 
-# BLECore
-cd Packages/BLECore && swift test
+# App iOS (simulator, pas besoin de signature)
+xcodebuild -project WalkForge.xcodeproj -scheme WalkForge \
+    -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
+    CODE_SIGNING_ALLOWED=NO build
 ```
 
 ### Lint

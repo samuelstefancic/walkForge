@@ -5,7 +5,7 @@ on:
     branches: [main, develop]
   push:
     branches: [main]
-  workflow_dispatch:  # déclenchement manuel depuis l'UI
+  workflow_dispatch: # déclenchement manuel depuis l'UI
 
 # Annule les runs CI en cours pour la même branche quand un nouveau commit est poussé.
 concurrency:
@@ -34,8 +34,7 @@ jobs:
           restore-keys: brew-${{ runner.os }}-
 
       - name: Install SwiftLint + SwiftFormat
-        run: |
-          brew install swiftlint swiftformat
+        run: brew install swiftlint swiftformat
 
       - name: SwiftLint (strict)
         run: swiftlint --strict
@@ -43,24 +42,22 @@ jobs:
       - name: SwiftFormat (lint mode)
         run: swiftformat --lint .
 
-  test:
-    name: Build + Test (${{ matrix.package }})
+  test-package:
+    name: Test ${{ matrix.package }}
     runs-on: macos-15
     timeout-minutes: 15
 
     strategy:
       fail-fast: false
       matrix:
-        package: [DomainKit, BLECore]
+        package: [DomainKit, BLECore, DesignSystem]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode 16+
-        # Prend la dernière version stable disponible sur le runner.
+      - name: Toolchain info
         run: |
-          sudo xcode-select -p
           xcodebuild -version
           swift --version
 
@@ -79,3 +76,45 @@ jobs:
       - name: Test
         working-directory: Packages/${{ matrix.package }}
         run: swift test --parallel --enable-code-coverage
+
+  build-ios:
+    name: Build iOS (Simulator)
+    runs-on: macos-15
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache Homebrew
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/Homebrew
+            /opt/homebrew/Library/Taps
+          key: brew-${{ runner.os }}-xcodegen-xcbeautify
+          restore-keys: brew-${{ runner.os }}-
+
+      - name: Install XcodeGen + xcbeautify
+        run: brew install xcodegen xcbeautify
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Pick available iPhone simulator
+        id: sim
+        run: |
+          NAME=$(xcrun simctl list devices available | grep -Eo "iPhone [0-9]+( Pro)?" | head -1)
+          echo "Using simulator: $NAME"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Build for iOS Simulator
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project WalkForge.xcodeproj \
+            -scheme WalkForge \
+            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }},OS=latest" \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            build 2>&1 | xcbeautify
