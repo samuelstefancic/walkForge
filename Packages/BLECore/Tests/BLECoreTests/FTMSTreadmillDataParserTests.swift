@@ -1,7 +1,6 @@
 // WalkForge — BLECoreTests
 // Agent-Tests: parsing binaire de trames Treadmill Data (0x2ACD).
 // Toutes les trames sont construites conformément à la spec Bluetooth SIG FTMS.
-// swiftlint:disable identifier_name
 
 @testable import BLECore
 import DomainKit
@@ -12,8 +11,8 @@ import Testing
 struct FTMSTreadmillDataParserTests {
     // MARK: - Cas nominal : speed uniquement (flags = 0x0000)
 
-    @Test
-    func `Speed seul : flags=0x0000, speed=3.00 km/h`() throws {
+    @Test("Speed seul : flags=0x0000, speed=3.00 km/h")
+    func speedOnly() throws {
         // Payload: flags(2) + speed(2) = 4 octets
         // flags = 0x0000 → bit 0 (More Data) == 0 → speed présente
         // speed raw = 300 = 0x012C → LE [0x2C, 0x01]
@@ -30,8 +29,8 @@ struct FTMSTreadmillDataParserTests {
 
     // MARK: - Speed + distance + elapsed
 
-    @Test
-    func `Speed + distance + elapsed : flags=0x0404`() throws {
+    @Test("Speed + distance + elapsed : flags=0x0404")
+    func speedDistanceElapsed() throws {
         // flags bits : 0 (More Data)=0 → speed présente, 2=distance, 10=elapsed
         // flags = 0b0000_0100_0000_0100 = 0x0404 → LE [0x04, 0x04]
         // speed raw = 500 → 5.00 km/h → 0x01F4 LE [0xF4, 0x01]
@@ -52,8 +51,8 @@ struct FTMSTreadmillDataParserTests {
 
     // MARK: - Inclinaison
 
-    @Test
-    func `Inclinaison positive 2.5% : flags=0x0008`() throws {
+    @Test("Inclinaison positive 2.5%")
+    func inclinationPositive() throws {
         // flags = 0x0008 (bit 3 = inclination)
         // speed = 0.00 (mais bit 0 = 0 donc speed présente = 2 bytes à 0)
         // inclination raw = 25 (0x0019) → 2.5 %
@@ -69,8 +68,8 @@ struct FTMSTreadmillDataParserTests {
         #expect(parsed.inclinationPercent == 2.5)
     }
 
-    @Test
-    func `Inclinaison négative -1.5% (int16 signé)`() throws {
+    @Test("Inclinaison négative -1.5% (int16 signé)")
+    func inclinationNegative() throws {
         // int16 -15 = 0xFFF1 LE [0xF1, 0xFF]
         let data = Data([
             0x08, 0x00,
@@ -85,8 +84,8 @@ struct FTMSTreadmillDataParserTests {
 
     // MARK: - Énergie
 
-    @Test
-    func `Énergie présente : total = 42 kcal`() throws {
+    @Test("Énergie présente : total = 42 kcal")
+    func totalEnergy() throws {
         // flags = 0x0080 (bit 7 expended energy)
         // total = 42 kcal = 0x002A LE [0x2A, 0x00]
         // energy per hour = 0, per minute = 0
@@ -102,8 +101,8 @@ struct FTMSTreadmillDataParserTests {
         #expect(parsed.totalEnergyKcal == 42.0)
     }
 
-    @Test
-    func `Énergie 0xFFFF = inconnu → nil`() throws {
+    @Test("Énergie 0xFFFF = inconnu → nil")
+    func energyUnknownSentinel() throws {
         let data = Data([
             0x80, 0x00,
             0x00, 0x00,
@@ -118,8 +117,8 @@ struct FTMSTreadmillDataParserTests {
 
     // MARK: - Fréquence cardiaque
 
-    @Test
-    func `Heart Rate 120 bpm (flags=0x0100)`() throws {
+    @Test("Heart Rate 120 bpm (flags=0x0100)")
+    func heartRate() throws {
         let data = Data([
             0x00, 0x01, // flags = 0x0100 (bit 8 heart rate)
             0x00, 0x00, // speed
@@ -132,8 +131,8 @@ struct FTMSTreadmillDataParserTests {
 
     // MARK: - Combinaison complète
 
-    @Test
-    func `Trame complète : speed + distance + incline + energy + HR + elapsed`() throws {
+    @Test("Trame complète : speed + distance + incline + energy + HR + elapsed")
+    func fullFrame() throws {
         // flags bits : 2 (distance), 3 (incline), 7 (energy), 8 (HR), 10 (elapsed)
         // = 0b0000_0101_1000_1100 = 0x058C
         let data = Data([
@@ -160,8 +159,8 @@ struct FTMSTreadmillDataParserTests {
 
     // MARK: - More Data bit : speed absente
 
-    @Test
-    func `Bit More Data = 1 → speed = 0`() throws {
+    @Test("Bit More Data = 1 → speed = 0")
+    func moreDataBitSet() throws {
         // flags = 0x0001 : bit 0 = 1 → Instantaneous Speed ABSENTE
         let data = Data([0x01, 0x00])
         let parsed = try FTMSTreadmillDataParser.parse(data)
@@ -171,15 +170,15 @@ struct FTMSTreadmillDataParserTests {
 
     // MARK: - Robustesse — trames malformées
 
-    @Test
-    func `Trame vide → erreur`() {
+    @Test("Trame vide → erreur")
+    func emptyData() {
         #expect(throws: TreadmillError.self) {
             _ = try FTMSTreadmillDataParser.parse(Data())
         }
     }
 
-    @Test
-    func `Trame avec flags seulement, speed présente mais tronquée`() {
+    @Test("Trame avec flags seulement, speed présente mais tronquée")
+    func truncatedSpeed() {
         // flags = 0x0000 implique speed présente (2 bytes), mais on coupe avant
         let data = Data([0x00, 0x00, 0x2C]) // 1 byte pour speed au lieu de 2
         #expect(throws: TreadmillError.self) {
@@ -187,8 +186,8 @@ struct FTMSTreadmillDataParserTests {
         }
     }
 
-    @Test
-    func `Trame distance tronquée (2 bytes au lieu de 3)`() {
+    @Test("Trame distance tronquée (2 bytes au lieu de 3)")
+    func truncatedDistance() {
         // flags = 0x0004 (distance), speed + 2 bytes au lieu de 3
         let data = Data([
             0x04, 0x00,

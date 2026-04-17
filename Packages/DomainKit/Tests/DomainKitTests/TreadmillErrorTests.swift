@@ -1,14 +1,13 @@
 // WalkForge — DomainKitTests
 // Agent-Tests: messages d'erreur lisibles par l'utilisateur.
-// swiftlint:disable identifier_name
 
 @testable import DomainKit
 import Testing
 
 @Suite("TreadmillError")
 struct TreadmillErrorTests {
-    @Test
-    func `Descriptions françaises non vides`() {
+    @Test("Descriptions françaises non vides")
+    func descriptions() {
         let cases: [TreadmillError] = [
             .bluetoothUnavailable,
             .bluetoothUnauthorized,
@@ -30,15 +29,15 @@ struct TreadmillErrorTests {
         }
     }
 
-    @Test
-    func `ftmsOperationFailed formate les opcodes en hex`() {
+    @Test("ftmsOperationFailed formate les opcodes en hex")
+    func hexFormatting() {
         let error: TreadmillError = .ftmsOperationFailed(opcode: 0x02, resultCode: 0x03)
         #expect(error.description.contains("0x02"))
         #expect(error.description.contains("0x03"))
     }
 
-    @Test
-    func `Equatable: même cas + paramètres = égaux`() {
+    @Test("Equatable même cas + paramètres = égaux")
+    func equality() {
         let timeoutA: TreadmillError = .timeout
         let timeoutB: TreadmillError = .timeout
         #expect(timeoutA == timeoutB)

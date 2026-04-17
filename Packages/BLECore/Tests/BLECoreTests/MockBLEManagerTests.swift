@@ -1,6 +1,5 @@
 // WalkForge — BLECoreTests
 // Agent-Tests: validation du simulateur actor MockBLEManager.
-// swiftlint:disable identifier_name
 
 @testable import BLECore
 import DomainKit
@@ -9,15 +8,15 @@ import Testing
 
 @Suite("MockBLEManager · lifecycle + commandes")
 struct MockBLEManagerTests {
-    @Test
-    func `État initial = idle`() async {
+    @Test("État initial = idle")
+    func initialState() async {
         let mock = MockBLEManager()
         let state = await mock.currentConnectionState
         #expect(state == .idle)
     }
 
-    @Test
-    func `startScanning → état scanning + device émis`() async throws {
+    @Test("startScanning émet scanning + device")
+    func scanningEmitsDevices() async throws {
         let mock = MockBLEManager()
 
         // Itération limitée pour ne pas bloquer
@@ -38,8 +37,8 @@ struct MockBLEManagerTests {
         #expect(state == .scanning)
     }
 
-    @Test
-    func `connect → état connected`() async throws {
+    @Test("connect transite vers .connected")
+    func connect() async throws {
         let mock = MockBLEManager()
         try await mock.startScanning()
 
@@ -54,16 +53,16 @@ struct MockBLEManagerTests {
         }
     }
 
-    @Test
-    func `connect sur device inconnu → deviceNotFound`() async {
+    @Test("connect sur device inconnu → deviceNotFound")
+    func connectUnknownDevice() async {
         let mock = MockBLEManager()
         await #expect(throws: TreadmillError.deviceNotFound) {
             try await mock.connect(to: "00000000-0000-0000-0000-FAKEFAKE0000")
         }
     }
 
-    @Test
-    func `start sans requestControl → controlNotGranted`() async throws {
+    @Test("start sans requestControl → controlNotGranted")
+    func startWithoutControl() async throws {
         let mock = MockBLEManager()
         try await mock.startScanning()
         try await mock.connect(to: MockBLEManager.defaultDevices[0].id)
@@ -73,16 +72,16 @@ struct MockBLEManagerTests {
         }
     }
 
-    @Test
-    func `start sans connexion → notConnected`() async {
+    @Test("start sans connexion → notConnected")
+    func startWithoutConnection() async {
         let mock = MockBLEManager()
         await #expect(throws: TreadmillError.notConnected) {
             try await mock.requestControl()
         }
     }
 
-    @Test
-    func `setTargetSpeed hors plage → invalidSpeed`() async throws {
+    @Test("setTargetSpeed hors plage → invalidSpeed")
+    func invalidSpeed() async throws {
         let mock = MockBLEManager()
         try await mock.startScanning()
         try await mock.connect(to: MockBLEManager.defaultDevices[0].id)
@@ -93,8 +92,8 @@ struct MockBLEManagerTests {
         }
     }
 
-    @Test
-    func `Flux complet : scan → connect → control → start → set speed → data emise`() async throws {
+    @Test("Flux complet scan → connect → control → start → speed → data")
+    func fullFlow() async throws {
         let mock = MockBLEManager(
             acceleration: 10.0, // très rapide pour test court
             tickInterval: .milliseconds(50),
@@ -121,8 +120,8 @@ struct MockBLEManagerTests {
         try await mock.stop()
     }
 
-    @Test
-    func `disconnect réinitialise la physique`() async throws {
+    @Test("disconnect réinitialise la physique")
+    func disconnectResets() async throws {
         let mock = MockBLEManager()
         try await mock.startScanning()
         try await mock.connect(to: MockBLEManager.defaultDevices[0].id)
