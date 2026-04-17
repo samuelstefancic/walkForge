@@ -68,18 +68,28 @@ public final class DashboardViewModel {
     private let stopSession: StopSessionUseCase
     private let setSpeed: SetTargetSpeedUseCase
     private let setIncline: SetInclineUseCase
+    private let persistSession: PersistSessionUseCase?
+    private let motorRestAlert: MotorRestAlertUseCase?
     private var history: [TreadmillData] = []
+    private var sessionStartDate: Date?
+    private var motorRestAlreadyFired = false
 
     private let logger = Logger(subsystem: "com.samuel.walkforge", category: "Dashboard")
 
     // MARK: - Init
 
-    public init(bleService: any BLETreadmillServiceProtocol) {
+    public init(
+        bleService: any BLETreadmillServiceProtocol,
+        workoutRepository: (any WorkoutSessionRepository)? = nil,
+        notificationService: (any NotificationServiceProtocol)? = nil,
+    ) {
         self.bleService = bleService
         startSession = StartSessionUseCase(bleService: bleService)
         stopSession = StopSessionUseCase(bleService: bleService)
         setSpeed = SetTargetSpeedUseCase(bleService: bleService)
         setIncline = SetInclineUseCase(bleService: bleService)
+        persistSession = workoutRepository.map { PersistSessionUseCase(repository: $0) }
+        motorRestAlert = notificationService.map { MotorRestAlertUseCase(notificationService: $0) }
     }
 
     // MARK: - Lifecycle
@@ -110,6 +120,20 @@ public final class DashboardViewModel {
             if history.count > 1000 {
                 history.removeFirst(history.count - 1000)
             }
+            await checkMotorRestAlert(elapsedSeconds: data.elapsedTimeSeconds)
+        }
+    }
+
+    private func checkMotorRestAlert(elapsedSeconds: Int) async {
+        guard let motorRestAlert, isSessionActive else { return }
+        do {
+            let fired = try await motorRestAlert.evaluate(
+                elapsedSeconds: elapsedSeconds,
+                alreadyAlerted: motorRestAlreadyFired,
+            )
+            if fired { motorRestAlreadyFired = true }
+        } catch {
+            logger.error("Motor rest alert failed: \(String(describing: error), privacy: .public)")
         }
     }
 
@@ -160,6 +184,8 @@ public final class DashboardViewModel {
 
     private func startCurrentSession() async {
         history.removeAll()
+        motorRestAlreadyFired = false
+        sessionStartDate = Date()
         await runAction { () throws(TreadmillError) in
             try await self.startSession.execute()
         }
@@ -172,10 +198,35 @@ public final class DashboardViewModel {
     private func stopCurrentSession() async {
         let last = lastData
         let snap = history
-        await runAction { () throws(TreadmillError) in
-            _ = try await self.stopSession.execute(lastSnapshot: last, history: snap)
+        let start = sessionStartDate ?? Date()
+        let incline = inclineLevel.rawValue
+
+        // 1. Arrêt + calcul résumé (via use case)
+        var summary: SessionSummary?
+        do {
+            let result = try await stopSession.execute(lastSnapshot: last, history: snap)
+            summary = result
+            errorMessage = nil
+        } catch {
+            errorMessage = error.description
+            logger.error("Stop session failed: \(String(describing: error), privacy: .public)")
         }
+
+        // 2. Persistance (optionnelle, best-effort)
+        if let persistSession, let summary {
+            do {
+                _ = try await persistSession.execute(
+                    summary: summary,
+                    startDate: start,
+                    inclineLevel: incline,
+                )
+            } catch {
+                logger.error("Persist session failed: \(String(describing: error), privacy: .public)")
+            }
+        }
+
         isSessionActive = false
+        sessionStartDate = nil
     }
 
     private func runAction(_ block: () async throws(TreadmillError) -> Void) async {

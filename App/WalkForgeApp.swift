@@ -1,26 +1,44 @@
 // WalkForge — App
 // Agent-Session: point d'entrée iOS.
 
-import BLECore
 import DomainKit
 import SwiftUI
 
 @main
 struct WalkForgeApp: App {
-    /// En Sprint 2 : on utilise MockBLEManager partout (pas d'Apple Developer Program
-    /// ni de PORTENTUM physique pour l'instant). La bascule vers BLEManager réel
-    /// se fera via une compile-time flag en Sprint 3.
-    @State private var viewModel: DashboardViewModel
+    @State private var services: AppServices
+    @State private var dashboardVM: DashboardViewModel
+    @State private var programsVM: ProgramsViewModel
+    @State private var profileVM: ProfileViewModel
 
     init() {
-        let service = MockBLEManager()
-        _viewModel = State(initialValue: DashboardViewModel(bleService: service))
+        let services = AppServices()
+        _services = State(initialValue: services)
+        _dashboardVM = State(initialValue: DashboardViewModel(
+            bleService: services.bleService,
+            workoutRepository: services.workoutRepository,
+            notificationService: services.notificationService,
+        ))
+        _programsVM = State(initialValue: ProgramsViewModel(
+            repository: services.programRepository,
+        ))
+        _profileVM = State(initialValue: ProfileViewModel(
+            repository: services.userProfileRepository,
+            notificationService: services.notificationService,
+        ))
     }
 
     var body: some Scene {
         WindowGroup {
-            DashboardView(viewModel: viewModel)
-                .preferredColorScheme(.dark)
+            MainTabView(
+                dashboardVM: dashboardVM,
+                programsVM: programsVM,
+                profileVM: profileVM,
+            )
+            .preferredColorScheme(.dark)
+            .task {
+                _ = await services.notificationService.requestAuthorization()
+            }
         }
     }
 }
