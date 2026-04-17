@@ -1,0 +1,94 @@
+# WalkForge — XcodeGen project definition.
+# Génère WalkForge.xcodeproj : `xcodegen generate`.
+# L'.xcodeproj n'est PAS versionné (voir .gitignore) — seul ce fichier fait foi.
+
+name: WalkForge
+
+options:
+  bundleIdPrefix: com.samuel
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+  indentWidth: 4
+  tabWidth: 4
+  groupSortPosition: top
+  generateEmptyDirectories: true
+
+configs:
+  Debug: debug
+  Release: release
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: ""
+    CODE_SIGNING_REQUIRED: NO
+    CODE_SIGNING_ALLOWED: NO
+    ENABLE_PREVIEWS: YES
+
+packages:
+  DomainKit:
+    path: Packages/DomainKit
+  BLECore:
+    path: Packages/BLECore
+  DesignSystem:
+    path: Packages/DesignSystem
+
+targets:
+  WalkForge:
+    type: application
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: App
+        excludes:
+          - "**/.DS_Store"
+    dependencies:
+      - package: DomainKit
+      - package: BLECore
+      - package: DesignSystem
+    info:
+      path: App/Generated/Info.plist
+      properties:
+        CFBundleDisplayName: WalkForge
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        CFBundleDevelopmentRegion: fr
+        LSRequiresIPhoneOS: true
+        NSBluetoothAlwaysUsageDescription: "WalkForge pilote votre tapis de marche par Bluetooth Low Energy."
+        NSBluetoothPeripheralUsageDescription: "WalkForge pilote votre tapis de marche par Bluetooth Low Energy."
+        UIBackgroundModes:
+          - bluetooth-central
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UILaunchScreen:
+          UIColorName: BackgroundPrimary
+        UIRequiredDeviceCapabilities:
+          - arm64
+          - bluetooth-le
+        UIRequiresFullScreen: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UIUserInterfaceStyle: Dark
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.samuel.walkforge
+        PRODUCT_NAME: WalkForge
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+    scheme:
+      testTargets: []
+      gatherCoverageData: false
+      commandLineArguments:
+        "-AppleLanguages (fr)": true

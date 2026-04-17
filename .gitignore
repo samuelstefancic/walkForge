@@ -8,6 +8,12 @@ DerivedData/
 *.xcscmblueprint
 xcuserdata/
 
+# Projet Xcode généré par XcodeGen (source = project.yml)
+/WalkForge.xcodeproj/
+
+# Info.plist généré par XcodeGen à partir de project.yml
+/App/Generated/
+
 # Swift Package Manager
 .build/
 .swiftpm/
