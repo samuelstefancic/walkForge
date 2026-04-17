@@ -9,7 +9,11 @@ import DomainKit
 import Foundation
 import os
 #if canImport(UserNotifications)
-import UserNotifications
+// @preconcurrency : les types de UserNotifications (UNNotificationSettings, etc.)
+// ne sont pas Sendable sur les SDKs < macOS 26 / iOS 19. Sur Xcode 16.x (CI)
+// cela ferait échouer la compilation en Swift 6 strict. Les appels sont faits
+// depuis l'actor → sûrs en pratique.
+@preconcurrency import UserNotifications
 #endif
 
 /// Service de notifications utilisant `UserNotifications`.
