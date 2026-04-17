@@ -36,8 +36,8 @@ walkForge/
 │   ├── BLECore/                  # CoreBluetooth + parser FTMS (Sprint 1)
 │   ├── DomainKit/                # Entités + Use Cases + Protocols (Sprint 1-2)
 │   ├── DesignSystem/             # Palette + composants SwiftUI (Sprint 2)
-│   ├── DataKit/                  # SwiftData + repositories (Sprint 3)
-│   ├── NotificationKit/          # UserNotifications (Sprint 3)
+│   ├── DataKit/                  # SwiftData + repositories (Sprint 3 ✅)
+│   ├── NotificationKit/          # UserNotifications (Sprint 3 ✅)
 │   ├── HealthKitBridge/          # Intégration HealthKit (Sprint 4)
 │   └── WidgetExtension/          # Widgets (Sprint 4)
 ├── WatchApp/                     # Scaffold watchOS (Sprint 5)
@@ -52,7 +52,7 @@ walkForge/
 
 - [x] **Sprint 1** — Fondations BLE + Infrastructure (parser FTMS, MockBLE, protocols domaine, CI)
 - [x] **Sprint 2** — Contrôle vitesse + Session live (use cases, DesignSystem, iOS app, Dashboard)
-- [ ] **Sprint 3** — Notifications + Programmes + Maintenance
+- [x] **Sprint 3** — Notifications + Programmes + Maintenance (DataKit/SwiftData, NotificationKit, Profile, Programs, TabView)
 - [ ] **Sprint 4** — Historique + HealthKit + Widgets
 - [ ] **Sprint 5** — Polish, CI/CD complet, App Store
 
@@ -80,9 +80,11 @@ open WalkForge.xcodeproj
 
 ```bash
 # Packages SPM (tests isolés, rapides)
-cd Packages/DomainKit && swift test
-cd Packages/BLECore   && swift test
-cd Packages/DesignSystem && swift test
+cd Packages/DomainKit      && swift test
+cd Packages/BLECore        && swift test
+cd Packages/DesignSystem   && swift test
+cd Packages/DataKit        && swift test
+cd Packages/NotificationKit && swift test
 
 # App iOS (simulator, pas besoin de signature)
 xcodebuild -project WalkForge.xcodeproj -scheme WalkForge \

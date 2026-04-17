@@ -39,6 +39,10 @@ packages:
     path: Packages/BLECore
   DesignSystem:
     path: Packages/DesignSystem
+  DataKit:
+    path: Packages/DataKit
+  NotificationKit:
+    path: Packages/NotificationKit
 
 targets:
   WalkForge:
@@ -53,6 +57,8 @@ targets:
       - package: DomainKit
       - package: BLECore
       - package: DesignSystem
+      - package: DataKit
+      - package: NotificationKit
     info:
       path: App/Generated/Info.plist
       properties:
@@ -63,6 +69,7 @@ targets:
         LSRequiresIPhoneOS: true
         NSBluetoothAlwaysUsageDescription: "WalkForge pilote votre tapis de marche par Bluetooth Low Energy."
         NSBluetoothPeripheralUsageDescription: "WalkForge pilote votre tapis de marche par Bluetooth Low Energy."
+        NSUserNotificationsUsageDescription: "WalkForge vous notifie en fin de session, pour la maintenance du tapis, et vos rappels de programmes."
         UIBackgroundModes:
           - bluetooth-central
         UIApplicationSceneManifest:
