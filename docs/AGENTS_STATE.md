@@ -7,10 +7,10 @@
 ## 🎛️ Orchestrateur
 
 - **Statut** : actif
-- **Sprint en cours** : Sprint 2 — Contrôle vitesse + Session live
-- **Sprint précédent** : ✅ Sprint 1 mergé (commit `cc71b9e`)
+- **Sprint en cours** : Sprint 3 — Data + Notifications + Maintenance
+- **Sprints précédents** : ✅ Sprint 1 (`cc71b9e`), ✅ Sprint 2 (`83b5473`)
 - **Bloquants** : aucun
-- **Prochaine étape** : Sprint 3 (notifications, programmes, maintenance)
+- **Prochaine étape** : Sprint 4 (Historique + HealthKit + Widgets)
 
 ---
 
@@ -21,15 +21,25 @@
 | Agent-BLE      | `BLECore` (FTMS parser, `BLEManager`, `MockBLEManager`)           | 38 ✅  |
 | Agent-Domain   | `DomainKit` entités + protocols + errors                          | 12 ✅  |
 
-## Sprint 2 — Agents actifs
+## Sprint 2 (✅ mergé) — Livrables
+
+| Agent          | Livrable                                                          | Tests  |
+| -------------- | ----------------------------------------------------------------- | ------ |
+| Agent-Domain   | 5 use cases session                                                | 19 ✅ |
+| Agent-UI       | `DesignSystem` + 5 composants                                      | 1 ✅  |
+| Agent-Session  | App iOS + Dashboard                                                | —     |
+
+## Sprint 3 — Agents actifs
 
 | Agent          | Statut   | Livrable                                                          | Tests  |
 | -------------- | -------- | ----------------------------------------------------------------- | ------ |
-| Agent-Domain   | ✅ livré | 5 use cases (StartSession, StopSession, SetTargetSpeed, SetIncline, CalculateCalories) | 19 ✅ |
-| Agent-UI       | ✅ livré | `DesignSystem` (palette, typography, spacing, haptics, 5 composants)                   | 1 ✅   |
-| Agent-Session  | ✅ livré | App iOS + `DashboardViewModel` + `DashboardView`                  | —      |
-| Agent-Reviewer | ⏳       | Checklist Clean Architecture + Swift 6 strict concurrency         | —      |
-| Agent-Security | ⏳       | Audit : pas de données perso en logs, no force unwrap             | —      |
+| Agent-Domain   | ✅ livré | 3 use cases (`MaintenanceAlert`, `MotorRestAlert`, `PersistSession`) + `NotificationServiceProtocol` | 8 ✅  |
+| Agent-Data     | ✅ livré | `DataKit` — 4 `@Model` SwiftData + 3 repositories `@ModelActor`     | 13 ✅ |
+| Agent-Infra    | ✅ livré | `NotificationKit` — `UserNotificationsService` + mapper            | 5 ✅  |
+| Agent-Profile  | ✅ livré | `ProfileView` (mensurations + objectifs + maintenance), `ProgramsView` (liste + création rapide) | —     |
+| Agent-Session  | ✅ livré | `DashboardViewModel` persistence + motor-rest alert + `AppServices` + `MainTabView` | —     |
+| Agent-Reviewer | ⏳       | Review Swift 6 strict complete + 0 lint violation                  | —     |
+| Agent-Security | ⏳       | Audit : ZERO donnée perso loggée, pas de KC avant S5              | —     |
 
 ---
 
