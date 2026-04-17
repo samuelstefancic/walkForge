@@ -1,0 +1,43 @@
+# Xcode
+build/
+DerivedData/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcuserstate
+*.xcuserdatad/
+*.xcscmblueprint
+xcuserdata/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Packages/*/Packages
+Packages/*/.build
+Package.resolved
+
+# CocoaPods / Carthage (si ajoutés plus tard)
+Pods/
+Carthage/Build/
+
+# macOS
+.DS_Store
+
+# Secrets / provisioning
+*.mobileprovision
+*.p12
+*.p8
+*.cer
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output/
+
+# Outils
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
