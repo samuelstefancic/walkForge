@@ -1,10 +1,11 @@
 // WalkForge — DataKit
 // Agent-Data: factory de ModelContainer pour l'app et les tests/preview.
+//
+// Note : `@preconcurrency import SwiftData` car `Schema` n'est pas Sendable
+// sur les SDKs antérieurs à macOS 26 / iOS 19 (CI Xcode 16.4 → SDK 15.5).
+// `@preconcurrency` passe ces avertissements en warnings plutôt qu'en erreurs.
 
 import Foundation
-// @preconcurrency : `Schema` n'est pas Sendable sur les SDKs antérieurs à
-// macOS 26 / iOS 19 (CI Xcode 16.4 avec SDK 15.5). `@preconcurrency` passe
-// ces warnings en warnings plutôt qu'en erreurs de compilation.
 @preconcurrency import SwiftData
 
 /// Fabrique centralisée de `ModelContainer` WalkForge.

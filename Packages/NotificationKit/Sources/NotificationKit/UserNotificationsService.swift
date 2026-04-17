@@ -1,18 +1,17 @@
 // WalkForge — NotificationKit
 // Agent-Infra: implémentation UserNotifications du NotificationServiceProtocol.
 //
-// Conditionnée sur `canImport(UserNotifications)` pour rester compilable
-// sur Linux/autres plateformes. Quand UserNotifications n'est pas dispo
-// (ex: SPM Linux), on expose une implémentation no-op.
+// - Conditionnée sur `canImport(UserNotifications)` pour rester compilable sur
+//   Linux et autres plateformes (no-op si non dispo).
+// - `@preconcurrency import UserNotifications` : les types Apple
+//   (UNNotificationSettings, etc.) ne sont pas encore Sendable sur les SDKs
+//   antérieurs à macOS 26 / iOS 19. Les appels sont faits depuis un actor
+//   → sûrs en pratique.
 
 import DomainKit
 import Foundation
 import os
 #if canImport(UserNotifications)
-// @preconcurrency : les types de UserNotifications (UNNotificationSettings, etc.)
-// ne sont pas Sendable sur les SDKs < macOS 26 / iOS 19. Sur Xcode 16.x (CI)
-// cela ferait échouer la compilation en Swift 6 strict. Les appels sont faits
-// depuis l'actor → sûrs en pratique.
 @preconcurrency import UserNotifications
 #endif
 
