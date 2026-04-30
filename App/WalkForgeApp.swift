@@ -8,6 +8,7 @@ import SwiftUI
 struct WalkForgeApp: App {
     @State private var services: AppServices
     @State private var dashboardVM: DashboardViewModel
+    @State private var historyVM: HistoryViewModel
     @State private var programsVM: ProgramsViewModel
     @State private var profileVM: ProfileViewModel
 
@@ -18,6 +19,10 @@ struct WalkForgeApp: App {
             bleService: services.bleService,
             workoutRepository: services.workoutRepository,
             notificationService: services.notificationService,
+            healthKitService: services.healthKitService,
+        ))
+        _historyVM = State(initialValue: HistoryViewModel(
+            repository: services.workoutRepository,
         ))
         _programsVM = State(initialValue: ProgramsViewModel(
             repository: services.programRepository,
@@ -32,12 +37,14 @@ struct WalkForgeApp: App {
         WindowGroup {
             MainTabView(
                 dashboardVM: dashboardVM,
+                historyVM: historyVM,
                 programsVM: programsVM,
                 profileVM: profileVM,
             )
             .preferredColorScheme(.dark)
             .task {
                 _ = await services.notificationService.requestAuthorization()
+                _ = try? await services.healthKitService.requestAuthorization()
             }
         }
     }

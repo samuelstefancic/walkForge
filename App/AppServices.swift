@@ -7,6 +7,7 @@
 import BLECore
 import DataKit
 import DomainKit
+import HealthKitBridge
 import NotificationKit
 import os
 import SwiftData
@@ -20,6 +21,7 @@ public final class AppServices {
     public let modelContainer: ModelContainer
     public let bleService: any BLETreadmillServiceProtocol
     public let notificationService: any NotificationServiceProtocol
+    public let healthKitService: any HealthKitServiceProtocol
     public let workoutRepository: any WorkoutSessionRepository
     public let userProfileRepository: any UserProfileRepository
     public let programRepository: any SessionProgramRepository
@@ -49,7 +51,10 @@ public final class AppServices {
         // 3. Notifications
         notificationService = UserNotificationsService()
 
-        // 4. Repositories SwiftData
+        // 4. HealthKit (vraie impl ; sans entitlement actif elle no-op proprement)
+        healthKitService = HealthKitService()
+
+        // 5. Repositories SwiftData
         workoutRepository = SwiftDataWorkoutSessionRepository(modelContainer: container)
         userProfileRepository = SwiftDataUserProfileRepository(modelContainer: container)
         programRepository = SwiftDataSessionProgramRepository(modelContainer: container)
@@ -60,7 +65,7 @@ public final class AppServices {
         AppServices(inMemory: true)
     }
 
-    private init(inMemory: Bool) {
+    private init(inMemory _: Bool) {
         let container = (try? ModelContainerFactory.inMemory())
             ?? {
                 fatalError("In-memory ModelContainer failed")
@@ -68,6 +73,7 @@ public final class AppServices {
         modelContainer = container
         bleService = MockBLEManager()
         notificationService = UserNotificationsService()
+        healthKitService = InMemoryHealthKitService()
         workoutRepository = SwiftDataWorkoutSessionRepository(modelContainer: container)
         userProfileRepository = SwiftDataUserProfileRepository(modelContainer: container)
         programRepository = SwiftDataSessionProgramRepository(modelContainer: container)

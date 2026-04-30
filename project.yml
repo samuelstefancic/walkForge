@@ -43,6 +43,8 @@ packages:
     path: Packages/DataKit
   NotificationKit:
     path: Packages/NotificationKit
+  HealthKitBridge:
+    path: Packages/HealthKitBridge
 
 targets:
   WalkForge:
@@ -59,6 +61,7 @@ targets:
       - package: DesignSystem
       - package: DataKit
       - package: NotificationKit
+      - package: HealthKitBridge
     info:
       path: App/Generated/Info.plist
       properties:
@@ -70,6 +73,8 @@ targets:
         NSBluetoothAlwaysUsageDescription: "WalkForge pilote votre tapis de marche par Bluetooth Low Energy."
         NSBluetoothPeripheralUsageDescription: "WalkForge pilote votre tapis de marche par Bluetooth Low Energy."
         NSUserNotificationsUsageDescription: "WalkForge vous notifie en fin de session, pour la maintenance du tapis, et vos rappels de programmes."
+        NSHealthShareUsageDescription: "WalkForge utilise votre poids et votre âge pour estimer plus précisément les calories dépensées."
+        NSHealthUpdateUsageDescription: "WalkForge enregistre vos sessions de marche dans l'app Santé pour les retrouver dans votre historique."
         UIBackgroundModes:
           - bluetooth-central
         UIApplicationSceneManifest:

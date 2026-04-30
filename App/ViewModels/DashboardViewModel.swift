@@ -64,6 +64,7 @@ public final class DashboardViewModel {
     // MARK: - Dependencies
 
     private let bleService: any BLETreadmillServiceProtocol
+    private let healthKitService: (any HealthKitServiceProtocol)?
     private let startSession: StartSessionUseCase
     private let stopSession: StopSessionUseCase
     private let setSpeed: SetTargetSpeedUseCase
@@ -82,8 +83,10 @@ public final class DashboardViewModel {
         bleService: any BLETreadmillServiceProtocol,
         workoutRepository: (any WorkoutSessionRepository)? = nil,
         notificationService: (any NotificationServiceProtocol)? = nil,
+        healthKitService: (any HealthKitServiceProtocol)? = nil,
     ) {
         self.bleService = bleService
+        self.healthKitService = healthKitService
         startSession = StartSessionUseCase(bleService: bleService)
         stopSession = StopSessionUseCase(bleService: bleService)
         setSpeed = SetTargetSpeedUseCase(bleService: bleService)
@@ -213,15 +216,25 @@ public final class DashboardViewModel {
         }
 
         // 2. Persistance (optionnelle, best-effort)
+        var persistedDTO: WorkoutSessionDTO?
         if let persistSession, let summary {
             do {
-                _ = try await persistSession.execute(
+                persistedDTO = try await persistSession.execute(
                     summary: summary,
                     startDate: start,
                     inclineLevel: incline,
                 )
             } catch {
                 logger.error("Persist session failed: \(String(describing: error), privacy: .public)")
+            }
+        }
+
+        // 3. Export HealthKit (best-effort, n'échoue pas le flux)
+        if let healthKitService, let dto = persistedDTO {
+            do {
+                _ = try await healthKitService.exportWorkout(dto)
+            } catch {
+                logger.error("HK export failed: \(String(describing: error), privacy: .public)")
             }
         }
 

@@ -6,6 +6,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @Bindable var dashboardVM: DashboardViewModel
+    @Bindable var historyVM: HistoryViewModel
     @Bindable var programsVM: ProgramsViewModel
     @Bindable var profileVM: ProfileViewModel
 
@@ -14,6 +15,11 @@ struct MainTabView: View {
             DashboardView(viewModel: dashboardVM)
                 .tabItem {
                     Label("Session", systemImage: "figure.walk.motion")
+                }
+
+            HistoryView(viewModel: historyVM)
+                .tabItem {
+                    Label("Historique", systemImage: "chart.line.uptrend.xyaxis")
                 }
 
             ProgramsView(viewModel: programsVM)
