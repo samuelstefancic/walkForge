@@ -50,7 +50,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [DomainKit, BLECore, DesignSystem, DataKit, NotificationKit]
+        package: [DomainKit, BLECore, DesignSystem, DataKit, NotificationKit, HealthKitBridge]
 
     steps:
       - name: Checkout
